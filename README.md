@@ -107,7 +107,7 @@ mxene-watersplitting-dft/
 
 ## Software Used
 
-- Quantum ESPRESSO — periodic DFT calculations (`pw.x`, `pp.x`, `projwfc.x`, `epsilon.x`)
+- [Quantum ESPRESSO](https://www.quantum-espresso.org/) — periodic DFT calculations (`pw.x`, `pp.x`, `projwfc.x`, `epsilon.x`)
 - Python (NumPy, Matplotlib) — post-processing, plotting
 
 ## Reproducing the Results
