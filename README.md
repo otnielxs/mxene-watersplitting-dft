@@ -24,7 +24,7 @@ This project also serves as a deliberate methods-expansion exercise: it is the f
 
 Zr and Hf (also studied in Xu *et al.* 2020) were intentionally excluded to keep the project tractable on local CPU-only hardware — see Limitations.
 
-## Methodology (summary — full detail in `docs/methodology.md`)
+## Methodology (summary — full detail in [`docs/methodology.md`](docs/methodology.md))
 
 1. **Structure & ground-state electronics**: `relax` → `scf` → `nscf`/`bands.x` (band structure) → `projwfc.x` (DOS), using PAW pseudopotentials, DFT-D3 dispersion, Marzari-Vanderbilt smearing.
 2. **Work function / band-edge alignment**: `pp.x` (`plot_num=11`) planar-averaged electrostatic potential → vacuum plateau → Φ = V_vacuum − E_Fermi → VBM/CBM referenced to vacuum → compared against the −4.44 eV / −5.67 eV redox lines.
