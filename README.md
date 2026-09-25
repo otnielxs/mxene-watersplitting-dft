@@ -29,7 +29,7 @@ Zr and Hf (also studied in Xu *et al.* 2020) were intentionally excluded to keep
 
 ## Methodology (summary — full detail in [`docs/methodology.md`](docs/methodology.md))
 
-1. **Structure & ground-state electronics**: `relax` → `scf` → `nscf`/`bands.x` (band structure) → `projwfc.x` (DOS), using PAW pseudopotentials, DFT-D3 dispersion, Marzari-Vanderbilt smearing.
+1. **Structure & ground-state electronics**: `relax` → `scf` → `nscf`/`bands.x` (band structure) → `dos.x` (DOS), using PAW pseudopotentials, DFT-D3 dispersion, Marzari-Vanderbilt smearing.
 2. **Work function / band-edge alignment**: `pp.x` (`plot_num=11`) planar-averaged electrostatic potential → vacuum plateau → Φ = V_vacuum − E_Fermi → VBM/CBM referenced to vacuum → compared against the −4.44 eV / −5.67 eV redox lines.
 3. **Optical properties**: separate dense-k, high-`nbnd` `nscf` run with **norm-conserving** pseudopotentials (required by `epsilon.x`; not compatible with the PAW pseudopotentials used elsewhere) → `epsilon.x` → dielectric function (in-plane, x/y-averaged) → absorption coefficient.
 
@@ -93,11 +93,11 @@ This directly rationalizes the heterostructure strategy in Xu *et al.* (2020): p
 mxene-watersplitting-dft/
 ├── README.md
 ├── ti2co2/
-│   ├── relax/  scf/  bands/  dos/  workfunction/  optical/
+│   ├── relax/  scf/  nscf/  bands/  dos/  workfunction/  optical/
 ├── ti2cf2/
-│   ├── relax/  scf/  bands/  dos/  workfunction/  optical/
+│   ├── relax/  scf/  nscf/  bands/  dos/  workfunction/  optical/
 ├── ti2coh2/
-│   ├── relax/  scf/  bands/  dos/  workfunction/  optical/
+│   ├── relax/  scf/  nscf/  bands/  dos/  workfunction/  optical/
 ├── scripts/
 │   ├── Vplateau.py              # workfunction: plateau detection, Ry->eV fix
 │   ├── band_alignment_plot.py   # VBM/CBM vs vacuum, vs redox potentials
@@ -110,27 +110,32 @@ mxene-watersplitting-dft/
 
 ## Software Used
 
-- [Quantum ESPRESSO](https://www.quantum-espresso.org/) — periodic DFT calculations (`pw.x`, `pp.x`, `projwfc.x`, `epsilon.x`)
+- [Quantum ESPRESSO](https://www.quantum-espresso.org/) — periodic DFT calculations (`pw.x`, `pp.x`, `dos.x`, `epsilon.x`,`average.x` )
 - Python (NumPy, Matplotlib) — post-processing, plotting
 
 ## Reproducing the Results
 
 ```bash
 # Ground state
-cd ti2co2/relax  && pw.x < relax.in  > relax.out
-cd ../scf        && pw.x < scf.in    > scf.out
-cd ../bands      && pw.x < nscf.in   > nscf.out && bands.x < bands.in > bands.out
-cd ../dos        && projwfc.x < dos.in > dos.out
+pw.x < relax.in  > relax.out
+pw.x < scf.in    > scf.out
+pw.x < nscf.in   > nscf.out
+pw.x < nscf_nbnd.in   > nscf_nbnd.out
+pw.x < bands.in   > bands.out
+bands.x < band.in > band.out
+dos.x < dos.in > dos.out
 
 # Work function / band alignment
-cd ../workfunction && pp.x < pp.in > pp.out
+pp.x < wf.in > wf.out
+average.x < average.in > average.out
 python3 ../../scripts/Vplateau.py
 python3 ../../scripts/band_alignment_plot.py
 
 # Optical (note: separate norm-conserving pseudopotentials required)
-cd ../optical && pw.x < nscf_optical.in > nscf_optical.out
-epsilon.x < epsilon.in > eps.out
-python3 ../../scripts/optical.py
+pw.x < scf_eps.in > scf_eps.out
+pw.x < nscf_eps.in > nscf_eps.out
+epsilon.x < eps.in > eps.out
+python3 ../../scripts/optical2.py
 ```
 
 Repeat for `ti2cf2/` and `ti2coh2/`.
