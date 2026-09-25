@@ -1,0 +1,47 @@
+&CONTROL
+  calculation = 'scf'
+  prefix = 'ti2coh2_eps'
+  outdir = './tmp'
+  pseudo_dir = '../pseudopotential'
+  nstep = 250
+/
+
+&SYSTEM
+  ibrav = 0
+  nat = 7
+  ntyp = 4
+  ecutwfc = 40
+  ecutrho = 320
+  occupations = 'smearing'
+  smearing = 'mv'
+  degauss = 0.02
+/
+
+&ELECTRONS
+  conv_thr = 1.0d-8
+/
+
+&IONS
+/
+
+CELL_PARAMETERS angstrom
+  3.04823   0.00000   0.00000
+ -1.52412   2.63985   0.00000
+  0.00000   0.00000  23.78628
+
+ATOMIC_SPECIES
+ Ti 47.867 Ti.upf
+ C  12.011 C.upf
+ O  15.999 O.upf
+ H   1.008 H.upf
+
+ATOMIC_POSITIONS angstrom
+Ti              -0.3149889923        1.7616873476        3.1244295565
+Ti               1.2111486923        0.8816680970        5.4392069598
+C                2.7341520773        0.0018410519        4.2817545462
+O               -0.3133175268        1.7619694792        6.7088176374
+O                1.2098265492        0.8831383589        1.8551924135
+H                1.2102270551        0.8940275121        0.8800389857
+H               -0.3176978548        1.7617281534        7.6840399009
+K_POINTS automatic
+ 6 6 1 0 0 0

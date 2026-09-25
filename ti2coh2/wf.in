@@ -1,0 +1,6 @@
+&INPUTPP
+  prefix='ti2coh2',
+  outdir='./tmp',
+  plot_num=11
+  filplot='pot_ti2coh2.pot'
+/

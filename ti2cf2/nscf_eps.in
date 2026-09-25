@@ -1,0 +1,47 @@
+&CONTROL
+  calculation = 'nscf'
+  prefix = 'ti2cf2_eps'
+  outdir = './tmp'
+  pseudo_dir = '../pseudopotential'
+  nstep = 250
+/
+
+&SYSTEM
+  ibrav = 0
+  nat = 5
+  ntyp = 3
+  nbnd = 80
+  ecutwfc = 40
+  ecutrho = 320
+  occupations = 'smearing'
+  smearing = 'mv'
+  degauss = 0.02
+  nosym = .true.
+  noinv = .true.
+/
+
+&ELECTRONS
+  conv_thr = 1.0d-8
+/
+
+&IONS
+/
+
+CELL_PARAMETERS angstrom
+  3.04823   0.00000   0.00000
+ -1.52412   2.63985   0.00000
+  0.00000   0.00000  21.78628
+
+ATOMIC_SPECIES
+ Ti 47.867 Ti.upf
+ C  12.011 C.upf
+ F  18.998 F.upf
+
+ATOMIC_POSITIONS angstrom
+Ti              -0.0000010567        1.7598995330        1.7420776257
+Ti               1.5241183522        0.8799504205        4.0441467426
+C                0.0000032885       -0.0000000030        2.8932481767
+F               -0.0000000904        1.7598999746        5.2896749914
+F                1.5241195065        0.8799500750        0.4965524636
+K_POINTS automatic
+ 12 12 1 0 0 0

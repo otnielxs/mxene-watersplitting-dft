@@ -1,0 +1,14 @@
+&inputpp
+    outdir        = './tmp/'
+    prefix        = 'ti2co2_eps'
+    calculation   = 'eps'
+/
+&energy_grid
+    smeartype     = 'mv'
+    intersmear    = 0.10
+    intrasmear    = 0.0
+    wmin          = 0.0
+    wmax          = 10.0
+    nw            = 1000
+    shift         = 0.0
+/

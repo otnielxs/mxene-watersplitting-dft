@@ -1,0 +1,6 @@
+&dos
+    outdir = './tmp'
+    prefix = 'ti2coh2'
+    fildos='ti2coh2.dos'
+    Emin=-8.0, Emax=8.0, DeltaE=0.01
+/

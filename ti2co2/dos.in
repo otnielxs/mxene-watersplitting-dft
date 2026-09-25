@@ -1,0 +1,6 @@
+&dos
+    outdir = './tmp'
+    prefix = 'ti2co2'
+    fildos='ti2co2.dos'
+    Emin=-4.0, Emax=4.0, DeltaE=0.01
+/

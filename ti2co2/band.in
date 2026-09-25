@@ -1,0 +1,5 @@
+&BANDS
+    prefix = 'ti2co2',
+    outdir = './tmp',
+    filband = 'ti2co2.bands'
+/

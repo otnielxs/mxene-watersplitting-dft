@@ -1,0 +1,49 @@
+&CONTROL
+  calculation = 'bands'
+  prefix = 'ti2co2'
+  outdir = './tmp'
+  pseudo_dir = '../pseudopotential'
+  nstep = 250
+/
+
+&SYSTEM
+  ibrav = 0
+  nat = 5
+  ntyp = 3
+  ecutwfc = 40
+  ecutrho = 320
+  occupations = 'smearing'
+  smearing = 'mv'
+  degauss = 0.02
+  nosym = .true.
+/
+&ELECTRONS
+  conv_thr = 1.0d-8
+/
+
+&IONS
+/
+
+CELL_PARAMETERS angstrom
+  3.03214   0.00000   0.00000
+ -1.51607   2.62591   0.00000
+  0.00000   0.00000  21.42568
+
+ATOMIC_SPECIES
+ Ti 47.867 Ti.pbe-spn-kjpaw_psl.1.0.0.UPF
+ C  12.011 C.pbe-n-kjpaw_psl.1.0.0.UPF
+ O  15.999 O.pbe-n-kjpaw_psl.1.0.0.UPF
+
+ATOMIC_POSITIONS angstrom
+Ti               0.0000000000        1.7506000000        2.4062271876
+Ti               1.5160700000        0.8753000000        5.0194531711
+C                0.0000000000       -0.0000000000        3.7129020170
+O                0.0000000000        1.7506000000        5.9274739460
+O                1.5160700000        0.8753000000        1.4981536783
+
+K_POINTS crystal_b
+4
+   0.0000000000     0.0000000000     0.0000000000     20
+  -0.3333333333     0.6666666667     0.0000000000     20
+   0.3333333333     0.3333333333     0.0000000000     20
+   0.0000000000     0.0000000000     0.0000000000     20

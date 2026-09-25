@@ -1,0 +1,47 @@
+&CONTROL
+  calculation = 'relax'
+  prefix = 'ti2coh2'
+  outdir = './tmp'
+  pseudo_dir = '../pseudopotential'
+  nstep = 250
+/
+
+&SYSTEM
+  ibrav = 0
+  nat = 7
+  ntyp = 4
+  ecutwfc = 40
+  ecutrho = 320
+  occupations = 'smearing'
+  smearing = 'mv'
+  degauss = 0.02
+/
+
+&ELECTRONS
+  conv_thr = 1.0d-8
+/
+
+&IONS
+/
+
+CELL_PARAMETERS angstrom
+  3.04823   0.00000   0.00000
+ -1.52412   2.63985   0.00000
+  0.00000   0.00000  23.78628
+
+ATOMIC_SPECIES
+ Ti 47.867 Ti.pbe-spn-kjpaw_psl.1.0.0.UPF
+ C  12.011 C.pbe-n-kjpaw_psl.1.0.0.UPF
+ O  15.999 O.pbe-n-kjpaw_psl.1.0.0.UPF
+ H   1.008 H.pbe-kjpaw_psl.1.0.0.UPF 
+
+ATOMIC_POSITIONS angstrom
+Ti  -0.34872   1.74970   2.92554
+Ti   1.18784   0.84429   5.67997
+ C   2.71826  -0.03783   4.32470
+ O   0.33107   2.16222   7.90082
+ O   1.47946   0.63004   1.09328
+ H   0.44163   0.74115   0.57686
+ H  -0.39019   1.85649   7.47231
+K_POINTS automatic
+ 4 4 1 0 0 0
