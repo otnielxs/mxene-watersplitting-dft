@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="figures/mxene-ws.png" width="600">
+</p>
 # Termination-Dependent Electronic and Optical Screening of Ti₂C MXene Monolayers for Photocatalytic Water Splitting: A DFT Study
 
 A computational screening study of three termination groups (=O, =F, -OH) on the Ti₂C MXene monolayer, using periodic DFT (Quantum ESPRESSO) to evaluate their electronic structure, band-edge alignment against water redox potentials, and optical absorption — as a standalone-monolayer complement to heterostructure-based overall-water-splitting studies such as Xu *et al.* (2020) on M₂CO₂/MoS₂ (M = Ti, Zr, Hf) van der Waals heterostructures.
