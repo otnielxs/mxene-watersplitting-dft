@@ -3,7 +3,7 @@
 </p>
 
 
-A computational screening study of three termination groups (=O, =F, -OH) on the Ti₂C MXene monolayer, using periodic DFT (Quantum ESPRESSO) to evaluate their electronic structure, band-edge alignment against water redox potentials, and optical absorption — as a standalone-monolayer complement to heterostructure-based overall-water-splitting studies such as Xu *et al.* (2020) on M₂CO₂/MoS₂ (M = Ti, Zr, Hf) van der Waals heterostructures.
+A computational screening study of three termination groups (=O, =F, -OH) on the Ti₂C MXene monolayer, using periodic DFT (Quantum ESPRESSO) to evaluate their electronic structure, band-edge alignment against water redox potentials, and optical absorption — as a standalone-monolayer complement to heterostructure-based overall-water-splitting studies such as [Xu *et al.* (2020) on M₂CO₂/MoS₂ (M = Ti, Zr, Hf) van der Waals heterostructures](https://doi.org/10.1016/j.ceramint.2020.02.119).
 
 ## Motivation
 
