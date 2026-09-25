@@ -2,10 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-# ============================================================
-# STYLE
-# ============================================================
-
 mpl.rcParams.update({
     "font.family": "DejaVu Serif",
     "font.size": 12,
@@ -16,22 +12,16 @@ mpl.rcParams.update({
     "lines.linewidth": 1.5,
 })
 
-# ============================================================
-# PARAMETER
-# ============================================================
+EF = 0.4327 # from scf.out
 
-# Fermi level dari scf.out
-EF = 0.4327
-
-# Batas energi
 emin = -5
 emax = 3
 
 k_points = [0.0000, 0.6667, 1.3333, 2.0000]
 k_labels = ["Γ", "K", "M", "Γ"]
 
-bands_file = "ti2cf2.bands.gnu"
-dos_file = "ti2cf2.dos"
+bands_file = "material.bands.gnu" # material file, e.g ti2co2.bands.gnu
+dos_file = "material.dos" # material file, e.g ti2co2.dos
 
 
 dos_max = None
@@ -52,7 +42,6 @@ with open(bands_file) as f:
         else:
             band.append([float(x) for x in line.split()])
 
-    # simpan band terakhir
     if band:
         bands.append(np.array(band))
 
@@ -77,8 +66,7 @@ for band in bands:
 
     k = band[:, 0]
 
-    # Energi digeser terhadap Fermi level
-    E = band[:, 1] - EF
+    E = band[:, 1] - EF # shift Fermi
 
     ax_band.plot(
         k,
