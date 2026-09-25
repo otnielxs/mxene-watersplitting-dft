@@ -7,7 +7,7 @@ A computational screening study of three termination groups (=O, =F, -OH) on the
 
 ## Motivation
 
-Heterostructure-based photocatalyst design (e.g. Ti₂CO₂/MoS₂ type-II heterostructures) typically begins by screening the electronic character of each constituent monolayer before pairing them. This project isolates that first step: rather than reproducing the Ti₂CO₂/MoS₂ heterostructure already studied in prior thesis work, it asks a narrower question — **can a Ti₂C MXene monolayer alone, under different terminations, satisfy the electronic requirements for overall water splitting, and how does termination change its optical response?**
+Heterostructure-based photocatalyst design (e.g. Ti₂CO₂/MoS₂ type-II heterostructures) typically begins by screening the electronic character of each constituent monolayer before pairing them. This project isolates that first step: rather than reproducing the [Ti₂CO₂/MoS₂ heterostructure already studied in prior thesis work](https://repository.ipb.ac.id/handle/123456789/176578), it asks a narrower question — **can a Ti₂C MXene monolayer alone, under different terminations, satisfy the electronic requirements for overall water splitting, and how does termination change its optical response?**
 
 This project also serves as a deliberate methods-expansion exercise: it is the first use of `epsilon.x` (dielectric function / optical absorption) in this line of work, building on the periodic-DFT + post-processing pipeline established in the prior gas-sensing project.
 
