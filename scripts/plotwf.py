@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 data = np.loadtxt("avg.dat")
-z = data[:, 0]        # position z (Bohr)
+z = data[:, 0]        # position in z (Bohr)
 
 Ry_to_eV = 13.6057
 V_planar = data[:, 1] * Ry_to_eV   # V_p(z) dalam eV
