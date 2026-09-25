@@ -33,10 +33,6 @@ ATOMIC_SPECIES
  F  18.998 F.pbe-n-kjpaw_psl.1.0.0.UPF
 
 ATOMIC_POSITIONS angstrom
-Ti              -0.0000010567        1.7598995330        1.7420776257
-Ti               1.5241183522        0.8799504205        4.0441467426
-C                0.0000032885       -0.0000000030        2.8932481767
-F               -0.0000000904        1.7598999746        5.2896749914
-F                1.5241195065        0.8799500750        0.4965524636
+! coordinate after relax.in optimized
 K_POINTS automatic
  8 8 1 0 0 0
