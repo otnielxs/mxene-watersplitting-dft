@@ -64,7 +64,7 @@ A material-specific split was required because `epsilon.x` does not support PAW 
 
 ## 7. Limitations and Assumptions
 
-- Only the Ti₂C family (O, F, OH terminations) was studied; Zr₂C and Hf₂C from the reference paper were excluded to keep the project tractable on local, CPU-only hardware (WSL2, RTX 3050 with no working GPU-accelerated QE build).
+- Only the Ti₂C family (O, F, OH terminations) was studied; Zr₂C and Hf₂C from the reference paper were excluded to keep the project tractable on local.
 - No AIMD-based thermal/dynamical stability check was performed for any of the three monolayers.
 - Band-edge-alignment method only, following Xu *et al.* (2020); no computational-hydrogen-electrode (CHE) Gibbs-free-energy pathway was computed, and no explicit DFT calculation of H₂O, H₂, or adsorbed intermediates (H*, OH*, O*, OOH*) was performed.
 - PBE band gaps are known to be underestimated relative to experiment; no scissor correction (`shift` in `epsilon.x`) was applied.
@@ -73,15 +73,3 @@ A material-specific split was required because `epsilon.x` does not support PAW 
 - Convergence testing for the optical pipeline was pushed as far as practical on available hardware (up to `nbnd = 200`, `ecutwfc = 60` Ry, 18×18×1 k-mesh for Ti₂CO₂) and stopped once Re(ε) stabilized; no further stress-testing (e.g. even higher `nbnd`/k-mesh) was pursued given local resource constraints.
 - Quantitative reflectivity R(ω) for the metallic materials was identified as a useful follow-up to substantiate the "plasmonic, not absorptive" interpretation but was not computed.
 
-## Revision Log
-
-| Stage | Change |
-|---|---|
-| Scoping | Defined project as standalone Ti₂CM₂ monolayer screening (O, F, OH), distinct from prior Ti₂CO₂/MoS₂ heterostructure thesis work; decided to add `epsilon.x` as a new method |
-| Ground state | Relax, scf, nscf, bands, DOS, workfunction completed for all three materials |
-| Workfunction debugging | Identified and fixed Ry→eV unit bug in `pp.x`/`average.x` post-processing |
-| Band alignment | Computed VBM/CBM vs. vacuum for all three; established Ti₂CO₂ as OER-only, Ti₂CF₂/Ti₂C(OH)₂ as disqualified (metallic) |
-| Optical, first pass | `epsilon.x` failed with PAW pseudopotentials (USPP not implemented); switched to norm-conserving pseudopotentials for the optical pipeline |
-| Optical, convergence | Iteratively increased `nbnd`/`ecutwfc`/k-mesh for Ti₂CO₂ until Re(ε) in the visible window converged to a physically sensible positive value |
-| Data pipeline fixes | Replaced line-dropping overflow cleanup with in-place NaN substitution to preserve energy-grid alignment; switched from out-of-plane (z) to in-plane (x,y) dielectric components; added C-rescaling for cross-material magnitude comparison |
-| Interpretation | Attributed high apparent absorption in metallic materials to plasmonic/negative-Re(ε) response rather than genuine interband absorption |
