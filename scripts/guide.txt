@@ -1,0 +1,186 @@
+## 1. Prepare Pseudopotentials -- TWO SETS NEEDED
+# Ground-state pipeline (relax/scf/nscf/bands/dos/workfunction): PAW, consistent
+# with prior thesis work.
+# Example: Ti.pbe-spn-kjpaw_psl.1.0.0.UPF, C.pbe-n-kjpaw_psl.1.0.0.UPF, O.pbe-n-kjpaw_psl.1.0.0.UPF
+
+# Optical pipeline (epsilon.x): epsilon.x does NOT support PAW/USPP
+# ("USPP are not implemented" error at grid_build). Use norm-conserving
+# (ONCV) pseudopotentials instead, e.g. from PseudoDojo/SSSP.
+# Example: Ti.upf, C.upf, O.upf, F.upf, H.upf (plain NC, no kjpaw suffix)
+mv *.upf ./pseudopotential/
+
+## 2. Ground-State Pipeline (per material: ti2co2, ti2cf2, ti2coh2)
+pw.x < relax.in > relax.out
+pw.x < scf.in   > scf.out
+pw.x < nscf.in  > nscf.out      # denser k, for bands.x
+bands.x < bands.in > bands.out
+projwfc.x < projwfc.in > projwfc.out
+
+# Smearing note: all three materials use occupations='smearing',
+# smearing='mv', degauss=0.02 -- INCLUDING Ti2CO2, even though it is a
+# narrow-gap semiconductor. This is consistent with prior project
+# convention (semi-metallic treatment) and is why epsilon.x later prints
+# "the system is a metal" for Ti2CO2 too -- that message is about the
+# occupation scheme used, not the material's actual gap. Confirm the real
+# gap from the nscf "highest occupied, lowest unoccupied" values instead.
+
+## 3. Work Function (pp.x) -- WATCH THE UNITS
+cat > pp.in << 'EOF'
+&INPUTPP
+  prefix='ti2co2'
+  outdir='./tmp'
+  plot_num=11
+  filplot='pot_ti2co2.pot'
+/
+EOF
+pp.x < pp.in > pp.out
+average.x < avg.in > avg.out   # -> avg.dat (columns: z, V_planar, V_macro)
+
+# *** CRITICAL BUG FOUND IN THIS PROJECT ***
+# avg.dat columns are in RYDBERG, not eV, even though pw.x's own Fermi
+# energy / VBM / CBM output IS already in eV. Mixing these units directly
+# gives nonsense work functions (we got a negative Phi for Ti2C(OH)2
+# before catching this). ALWAYS multiply the potential columns by
+# 13.6057 (Ry -> eV) before combining with pw.x energies:
+python3 - << 'EOF'
+import numpy as np
+RY_TO_EV = 13.6057
+data = np.loadtxt("avg.dat")
+z = data[:, 0]                       # Bohr
+V_planar_eV = data[:, 1] * RY_TO_EV
+V_macro_eV  = data[:, 2] * RY_TO_EV
+EOF
+
+# Vacuum plateau: use a gradient-threshold detector (|dV/dz| < 1e-3 eV/Bohr)
+# rather than eyeballing one point. See scripts/Vplateau.py.
+# Phi = V_vacuum - E_fermi
+# E_abs(VBM) = E_VBM_internal - V_vacuum
+# E_abs(CBM) = E_CBM_internal - V_vacuum
+
+## 4. Band Alignment vs Water Redox Potentials
+# Fixed literature reference values (NOT computed via DFT on H2O/H2):
+#   H+/H2  = -4.44 eV vs vacuum
+#   O2/H2O = -5.67 eV vs vacuum
+# Straddling criterion for a STANDALONE monolayer (not a heterostructure):
+#   CBM_abs > -4.44 eV  -> HER-capable
+#   VBM_abs < -5.67 eV  -> OER-capable
+# Both must hold for the material to split water on its own.
+python3 scripts/band_alignment_plot.py
+
+## 5. Optical Pipeline -- SEPARATE nscf, DIFFERENT PSEUDOPOTENTIALS
+cat > nscf_eps.in << 'EOF'
+&SYSTEM
+  ...
+  occupations = 'smearing'
+  smearing    = 'mv'
+  degauss     = 0.02
+  nbnd        = 200          # increased stepwise: 80 -> 120 -> 200 until
+                              # Re(eps) in 1.5-4 eV stabilized (Ti2CO2 case)
+  nosym       = .true.       # REQUIRED -- epsilon.x does not unfold
+  noinv       = .true.       # symmetry-reduced k-meshes
+/
+K_POINTS automatic
+  18 18 1 0 0 0               # also increased stepwise per material;
+                               # 12x12x1 was enough for Ti2CF2/Ti2C(OH)2,
+                               # Ti2CO2 needed 18x18x1
+EOF
+pw.x < nscf_eps.in > nscf_eps.out
+
+cat > eps.in << 'EOF'
+&inputpp
+    outdir      = './tmp/'
+    prefix      = 'ti2co2_eps'
+    calculation = 'eps'
+/
+&energy_grid
+    smeartype   = 'mv'
+    intersmear  = 0.10
+    intrasmear  = 0.0        # 0.0 for semiconductor (Ti2CO2);
+                              # 0.10 for metallic Ti2CF2/Ti2C(OH)2
+                              # (adds Drude/intraband term)
+    wmin        = 0.0
+    wmax        = 10.0
+    nw          = 1000
+    shift       = 0.0        # no scissor correction applied -- PBE-level
+                              # gaps/transition energies only
+/
+EOF
+epsilon.x < eps.in > eps.out
+# Outputs: epsr_<prefix>.dat (Re eps, columns: energy, x, y, z)
+#          epsi_<prefix>.dat (Im eps, columns: energy, x, y, z)
+
+## 6. Clean Output Files -- DO NOT grep -v THE OVERFLOW LINES
+# epsilon.x can write overflow tokens (********) when a value exceeds its
+# field width. Dropping those LINES (grep -v '***') is dangerous: overflow
+# happens independently in the real-part and imaginary-part files, so
+# naive index-based truncation afterwards can pair Re(eps) and Im(eps)
+# from DIFFERENT energy points. Also: two adjacent overflowing fields can
+# merge into one token with no separator, silently reducing a row's
+# column count.
+#
+# Instead: replace overflow tokens with NaN IN PLACE (never drop a row),
+# and warn + pad with NaN if a row still ends up with fewer than the
+# expected 4 columns. See scripts/optical.py::load_eps_file() for the
+# robust implementation. In this project it only ever affected the single
+# omega=0.001 eV row per file (already outside the analysis window).
+
+## 7. Plot Dielectric Function -- IN-PLANE, NOT OUT-OF-PLANE
+# Columns 1,2,3 of epsr/epsi = x,y,z. For a 2D sheet under normal-incidence
+# illumination, the IN-PLANE response (average of x and y) is the
+# physically relevant one -- NOT z (out-of-plane), which responds to a
+# different, less relevant geometry and is far more sensitive to vacuum
+# thickness.
+python3 - << 'EOF'
+eps1_inplane = (eps1_x + eps1_y) / 2
+eps2_inplane = (eps2_x + eps2_y) / 2
+EOF
+
+## 8. Rescale Before Comparing Materials -- CELL HEIGHT DIFFERS
+# Ti2CO2 C=21.42568 A, Ti2CF2 C=21.78628 A, Ti2C(OH)2 C=23.78628 A
+# (OH termination physically projects further from the Ti2C core).
+# Raw eps magnitude from a 3D-periodic slab calc is diluted inversely
+# with C, so magnitudes are NOT directly comparable across materials
+# until rescaled to a common C_ref (we used the largest, Ti2C(OH)2's C):
+#   eps1_rescaled = 1 + (eps1_raw - 1) * (C_material / C_ref)
+#   eps2_rescaled = eps2_raw * (C_material / C_ref)
+# Peak POSITIONS (transition energies) are unaffected by this -- only
+# magnitude comparisons need it.
+
+## 9. Convert to Absorption Spectrum
+c = 2.998e8
+omega = energy * 1.602e-19 / 1.055e-34
+alpha = sqrt(2) * omega / c * sqrt(sqrt(eps1**2 + eps2**2) - eps1)
+# alpha in 1/m -> multiply by 1e-2 for cm^-1
+#
+# *** INTERPRETATION CAVEAT ***
+# Mask/exclude energy < 1 eV from all conclusions -- this region is
+# dominated by intraband/Drude artifacts (metallic materials) or
+# Kramers-Kronig noise near omega=0 (Ti2CO2), even with intrasmear active.
+#
+# For Ti2CF2 / Ti2C(OH)2: large alpha in the 1.5-4 eV window coincides
+# with NEGATIVE Re(eps) there -- this means the apparent "absorption" is
+# dominated by a plasmonic/reflective response, not genuine interband
+# absorption usable for photocatalysis. Do not read high alpha alone as
+# "good light absorber" for a metallic material without checking Re(eps)
+# first.
+
+## 10. Compare with Literature
+# Xu et al. (2020) report band alignment and optical properties for the
+# Our results here are:
+#   - standalone Ti2CM2 monolayers only (no heterostructure built)
+#   - plain GGA-PBE, no scissor correction, no hybrid functional
+#   - band-edge-alignment method only (no CHE / Gibbs-free-energy pathway,
+#     no explicit H2O/H2 molecule DFT calculation)
+# Always state functional, pseudopotential family (PAW vs NC), and method
+# (band-alignment vs CHE) explicitly when comparing numbers to literature.
+
+## 11. Summary of Key Files
+- ti2co2/, ti2cf2/, ti2coh2/        -> per-material relax/scf/nscf/bands/dos/workfunction/optical
+- pseudo/ (PAW)  vs  pseudo_nc/ (norm-conserving, optical only)
+- avg.dat                          -> raw pp.x/average.x output (Ry, Bohr -- convert before use!)
+- epsr_<prefix>.dat, epsi_<prefix>.dat -> raw epsilon.x output (x,y,z columns)
+- scripts/Vplateau.py              -> plateau detection + Ry->eV fix
+- scripts/band_alignment_plot.py   -> VBM/CBM vs vacuum, vs redox potentials
+- scripts/optical.py               -> robust NaN-safe parsing, in-plane averaging,
+                                       C-rescaling, absorption coefficient
+- docs/methodology.md              -> full parameter justification and limitations
